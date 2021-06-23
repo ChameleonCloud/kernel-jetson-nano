@@ -1,48 +1,16 @@
-# cc-template
-Template Repository to define:
+# nvidia-kernel-build
 
-* Coding Style
-* Metadata for Publication
-* Contribution Guide
-* Software License
+This repo can be used to build the kernel and modules for the Nvidia Jetson Nano.
 
-## Python
+This is needed in order to add kernel modules that CHI@Edge needs, as nvidia does not include them by default.
 
-### Package Naming
+## Usage
 
+`make sources` will download and extract needed source files
 
-## Metadata For Publishing to PyPI
+`make tegra_defconfig` will generate the default nvidia kernel config
 
-Set Classifiers as appropriate from https://pypi.org/classifiers/
+`make menuconfig` will allow manual modification of the .config file
 
-Openstack Projects tend to specify
-- License :: OSI Approved :: Apache Software License
-
-or one of:
-- License :: OSI Approved :: MIT License
-- License :: OSI Approved :: BSD License
-
-Example setup.cfg
-
-```ini
-name = <package-name>
-summary = <short-description>
-description-file = README.md
-author = University of Chicago
-author-email = dev@lists.chameleoncloud.org
-home-page = https://www.chameleoncloud.org
-license_files = LICENSE
-python_requires = '>=3.6.2'
-classifier =
-    Development Status :: 4 - Beta
-    Environment :: OpenStack
-    Intended Audience :: Science/Research
-    Intended Audience :: System Administrators
-    Operating System :: POSIX :: Linux
-    Programming Language :: Python
-    Programming Language :: Python :: 3
-    Programming Language :: Python :: 3.6
-    Programming Language :: Python :: 3.7
-    Programming Language :: Python :: 3.8
-```
-
+`make image` will build the kenrel image file
+`make modules` will build all kernel modules

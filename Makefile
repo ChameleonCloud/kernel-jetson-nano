@@ -49,5 +49,15 @@ tegra_defconfig:
 	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) tegra_defconfig
 	cp $(TEGRA_KERNEL_OUT)/.config tegra_defconfig
 
+menuconfig:
+	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) menuconfig
+
 $(OUTPUT_DIR)/Image:
 	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) -j16
+
+.PHONY: image
+image: $(OUTPUT_DIR)/Image
+
+
+.PHONY: modules
+modules: $(OUTPUT_DIR)/modules
