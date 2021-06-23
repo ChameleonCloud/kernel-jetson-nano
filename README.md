@@ -14,3 +14,25 @@ This is needed in order to add kernel modules that CHI@Edge needs, as nvidia doe
 
 `make image` will build the kenrel image file
 `make modules` will build all kernel modules
+
+
+## Installation
+
+WARNING, these will seriously modify your system. Only run on a jetson nano that is not in active use.
+
+```
+# Save old modules for safety
+mv /lib/modules/4.9.201-tegra/ /lib/modules/4.9.201-tegra.backup/
+
+# Install new modules
+tar -C / -xjf kernel_supplements.tbz2 && sync
+
+# Save old kernel for safety
+mv /boot/Image /boot/Image.backup
+
+# Copy new kernel to boot
+cp Image /boot/  && sync && reboot
+
+
+
+```

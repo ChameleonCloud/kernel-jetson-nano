@@ -63,24 +63,27 @@ tegra.config:
 	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) tegra_defconfig
 	cp $(TEGRA_KERNEL_OUT)/.config tegra.config
 
-menuconfig:
+menuconfig: load-cc-config
 	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) menuconfig
 
-$(OUTPUT_DIR)/Image:
-	cp tegra.config $(TEGRA_KERNEL_OUT)/.config
+.PHONY: load-cc-config
+load-cc-config:
+	cp cc_tegra.config $(TEGRA_KERNEL_OUT)/.config
+
+$(OUTPUT_DIR)/Image: load-cc-config
 	mkdir -p $(OUTPUT_DIR)
 	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) -j12
 	cp $(TEGRA_KERNEL_OUT)/arch/arm64/boot/Image $(OUTPUT_DIR)/Image
 
 .PHONY: clean
 clean:
-	rm output/*
-	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) clean
+	rm -rf output/*
+	# make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) clean
 
 .PHONY: image
 image: $(OUTPUT_DIR)/Image
 
-$(OUTPUT_DIR)/Modules:
+$(OUTPUT_DIR)/Modules: load-cc-config
 	mkdir -p $(OUTPUT_DIR)
 	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) -j8 modules_install \
     	INSTALL_MOD_PATH=$(OUTPUT_DIR)/Modules
