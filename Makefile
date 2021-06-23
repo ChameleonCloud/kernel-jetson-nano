@@ -42,7 +42,7 @@ export CROSS_COMPILE=$(TOOLS_DIR)/$(LINARO_VER)/bin/aarch64-linux-gnu-
 export LOCALVERSION=-tegra
 
 TEGRA_KERNEL_OUT=$(CURDIR)/build
-OUTPUT_DIR=output
+OUTPUT_DIR=$(CURDIR)/output
 
 tegra_defconfig:
 	mkdir -p $(TEGRA_KERNEL_OUT)
@@ -53,11 +53,27 @@ menuconfig:
 	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) menuconfig
 
 $(OUTPUT_DIR)/Image:
-	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) -j16
+	mkdir -p $(OUTPUT_DIR)
+	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) -j12
+	cp $(TEGRA_KERNEL_OUT)/arch/arm64/boot/Image $(OUTPUT_DIR)/Image
+
+.PHONY: clean
+clean:
+	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) clean
 
 .PHONY: image
 image: $(OUTPUT_DIR)/Image
 
+$(OUTPUT_DIR)/Modules:
+	mkdir -p $(OUTPUT_DIR)
+	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) -j8 modules_install \
+    	INSTALL_MOD_PATH=$(OUTPUT_DIR)/Modules
+
+$(OUTPUT_DIR)/kernel_supplements.tbz2: $(OUTPUT_DIR)/Modules
+	tar -C $(OUTPUT_DIR)/Modules \
+		--owner root --group root \
+		-cjf $(OUTPUT_DIR)/kernel_supplements.tbz2 \
+    	lib/modules
 
 .PHONY: modules
-modules: $(OUTPUT_DIR)/modules
+modules: $(OUTPUT_DIR)/kernel_supplements.tbz2
