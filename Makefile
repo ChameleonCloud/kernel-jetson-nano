@@ -67,12 +67,14 @@ menuconfig:
 	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) menuconfig
 
 $(OUTPUT_DIR)/Image:
+	cp tegra.config $(TEGRA_KERNEL_OUT)/.config
 	mkdir -p $(OUTPUT_DIR)
 	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) -j12
 	cp $(TEGRA_KERNEL_OUT)/arch/arm64/boot/Image $(OUTPUT_DIR)/Image
 
 .PHONY: clean
 clean:
+	rm output/*
 	make -C $(KERNEL_SRC_DIR) ARCH=arm64 O=$(TEGRA_KERNEL_OUT) clean
 
 .PHONY: image
@@ -91,3 +93,6 @@ $(OUTPUT_DIR)/kernel_supplements.tbz2: $(OUTPUT_DIR)/Modules
 
 .PHONY: modules
 modules: $(OUTPUT_DIR)/kernel_supplements.tbz2
+
+.PHONY: all
+all: image modules
