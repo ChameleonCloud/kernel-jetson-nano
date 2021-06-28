@@ -48,9 +48,16 @@ upstream.config: data.tar.xz
 	tar --strip-components=4 -xf data.tar.xz "./usr/src/linux-headers-4.9.0-13-arm64/.config"
 	mv .config upstream.config
 
-.PHONY: sources
-sources: linaro_src l4t_src
 
+src/wireguard-linux-compat:
+	git clone https://git.zx2c4.com/wireguard-linux-compat src/wireguard-linux-compat
+
+.PHONY: patch_wg_kernel
+patch_wg_kernel: src/wireguard-linux-compat l4t_src
+	src/wireguard-linux-compat/kernel-tree-scripts/jury-rig.sh $(KERNEL_SRC_DIR)
+
+.PHONY: sources
+sources: linaro_src l4t_src patch_wg_kernel
 
 export CROSS_COMPILE=$(TOOLS_DIR)/$(LINARO_VER)/bin/aarch64-linux-gnu-
 export LOCALVERSION=-tegra
@@ -68,6 +75,7 @@ menuconfig: load-cc-config
 
 .PHONY: load-cc-config
 load-cc-config:
+	mkdir -p $(TEGRA_KERNEL_OUT)
 	cp cc_tegra.config $(TEGRA_KERNEL_OUT)/.config
 
 $(OUTPUT_DIR)/Image: load-cc-config
